@@ -4,14 +4,14 @@
 #include <unistd.h>
 
 /**
- * execute_command - Executes a command using execve.
+ * execute_command_with_args - Executes a command with arguments using execve.
  * @command: The command to execute.
+ * @args: An array of strings representing the command and its arguments.
  */
-void execute_command(char *command)
+void execute_command_with_args(char *command, char *args[])
 {
 char *path = "/bin/";
 char *full_path = (char *)malloc(strlen(path) + strlen(command) + 1);
-
 if (full_path == NULL)
 {
 perror("malloc");
@@ -21,7 +21,7 @@ exit(1);
 strcpy(full_path, path);
 strcat(full_path, command);
 
-if (execve(full_path, &command, NULL) == -1)
+if (execve(full_path, args, NULL) == -1)
 {
 perror("execve");
 }
@@ -45,6 +45,11 @@ ssize_t nread;
 
 while (1)
 {
+char *token;
+char *command;
+char *args[10];
+int arg_count = 0;
+        
 printf("#cisfun$ ");
 nread = getline(&line, &len, stdin);
 
@@ -59,7 +64,18 @@ continue;
 if (line[nread - 1] == '\n')
 line[nread - 1] = '\0';
 
-execute_command(line);
+token = strtok(line, " ");
+command = token;
+
+while (token != NULL)
+{
+token = strtok(NULL, " ");
+args[arg_count++] = token;
+}
+
+args[arg_count] = NULL;
+
+execute_command_with_args(command, args);
 }
 
 free(line);
