@@ -1,8 +1,9 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-/* Function declarations */
-int shell_main(void);
+void print_prompt();
+char *read_input();
+char **parse_input(char *line);
+int execute(char **args);
 
-#endif /* SHELL_H */
-
+#endif
