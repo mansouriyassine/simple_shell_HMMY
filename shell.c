@@ -45,11 +45,9 @@ ssize_t nread;
 
 while (1)
 {
-char *token;
-char *command;
-char *args[10];
+char *token, *command, *args[10];
 int arg_count = 0;
-        
+
 printf("#cisfun$ ");
 nread = getline(&line, &len, stdin);
 
