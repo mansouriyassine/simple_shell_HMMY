@@ -1,109 +1,67 @@
-#include "shell.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-/* Define constants */
-#define TOKEN_BUFSIZE 64
-#define TOKEN_DELIMITERS " \t\r\n\a"
 
 /**
- * print_prompt - Print the shell prompt
+ * execute_command - Executes a command using execve.
+ * @command: The command to execute.
  */
-void print_prompt(void)
+void execute_command(char *command)
 {
-printf("$ ");
+char *path = "/bin/";
+char *full_path = (char *)malloc(strlen(path) + strlen(command) + 1);
+
+if (full_path == NULL)
+{
+perror("malloc");
+exit(1);
+}
+
+strcpy(full_path, path);
+strcat(full_path, command);
+
+if (execve(full_path, &command, NULL) == -1)
+{
+perror("execve");
+}
+
+free(full_path);
 }
 
 /**
- * read_input - Read input from the user
+ * main - Entry point of the simple shell program.
  *
- * Return: The input line read from the user
+ * This function initializes the shell and enters an infinite loop to read
+ * user commands and execute them using the execve system call.
+ *
+ * Return: Always returns 0 to indicate successful execution.
  */
-char *read_input()
+int main(void)
 {
 char *line = NULL;
-size_t bufsize = 0;
+size_t len = 0;
+ssize_t nread;
 
-getline(&line, &bufsize, stdin);
-return (line);
-}
-
-/**
- * parse_input - Parse user input into tokens
- * @line: The input line
- *
- * Return: An array of tokens
- */
-char **parse_input(char *line)
+while (1)
 {
-int bufsize = TOKEN_BUFSIZE;
-int position = 0;
-char **tokens = malloc(bufsize * sizeof(char *));
-char *token;
+printf("#cisfun$ ");
+nread = getline(&line, &len, stdin);
 
-if (!tokens)
+if (nread == -1)
 {
-fprintf(stderr, "allocation error\n");
-exit(EXIT_FAILURE);
+if (feof(stdin))
+break;
+perror("getline");
+continue;
 }
 
-token = strtok(line, TOKEN_DELIMITERS);
-while (token != NULL)
-{
-tokens[position] = token;
-position++;
+if (line[nread - 1] == '\n')
+line[nread - 1] = '\0';
 
-if (position >= bufsize)
-{
-bufsize += TOKEN_BUFSIZE;
-tokens = realloc(tokens, bufsize * sizeof(char *));
-if (!tokens)
-{
-fprintf(stderr, "allocation error\n");
-exit(EXIT_FAILURE);
-}
+execute_command(line);
 }
 
-token = strtok(NULL, TOKEN_DELIMITERS);
-}
-tokens[position] = NULL;
-return (tokens);
-}
-
-/**
- * execute - Execute a command
- * @args: An array of arguments
- *
- * Return: 1 on success, 0 on exit command, -1 on failure
- */
-int execute(char **args)
-{
-pid_t pid;
-int status;
-
-if (strcmp(args[0], "exit") == 0)
-{
-exit(EXIT_SUCCESS);
-}
-
-pid = fork();
-if (pid == 0)
-{
-execve(args[0], args, NULL);
-perror("execve error");
-exit(EXIT_FAILURE);
-}
-else if (pid < 0)
-{
-perror("fork error");
-}
-else
-{
-waitpid(pid, &status, WUNTRACED);
-}
-return (1);
+free(line);
+return (0);
 }
