@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define MAX_ARGS 10
+
 /**
  * execute_command_with_args - Executes a command with arguments using execve.
  * @command: The command to execute.
@@ -12,6 +14,7 @@ void execute_command_with_args(char *command, char *args[])
 {
 char *path = "/bin/";
 char *full_path = (char *)malloc(strlen(path) + strlen(command) + 1);
+
 if (full_path == NULL)
 {
 perror("malloc");
@@ -30,6 +33,29 @@ free(full_path);
 }
 
 /**
+ * parse_input - Parses user input into a command and arguments array.
+ * @line: The input line.
+ * @command: Pointer to store the parsed command.
+ * @args: Pointer to store the parsed arguments.
+ */
+void parse_input(char *line, char **command, char **args)
+{
+char *token;
+int arg_count = 1;
+
+token = strtok(line, " ");
+*command = token;
+
+while (token != NULL)
+{
+token = strtok(NULL, " ");
+args[arg_count++] = token;
+}
+
+args[arg_count] = NULL;
+}
+
+/**
  * main - Entry point of the simple shell program.
  *
  * This function initializes the shell and enters an infinite loop to read
@@ -45,8 +71,8 @@ ssize_t nread;
 
 while (1)
 {
-char *token, *command, *args[10];
-int arg_count = 0;
+char *command;
+char *args[MAX_ARGS];
 
 printf("#cisfun$ ");
 nread = getline(&line, &len, stdin);
@@ -62,16 +88,7 @@ continue;
 if (line[nread - 1] == '\n')
 line[nread - 1] = '\0';
 
-token = strtok(line, " ");
-command = token;
-
-while (token != NULL)
-{
-token = strtok(NULL, " ");
-args[arg_count++] = token;
-}
-
-args[arg_count] = NULL;
+parse_input(line, &command, args);
 
 execute_command_with_args(command, args);
 }
