@@ -1,6 +1,5 @@
 #include "helpers.h"
 
-
 /**
  * read_line - Read a line of input from the user.
  *
@@ -55,7 +54,10 @@ int execute_command(char **args)
 {
 pid_t pid;
 int status;
+int i;
 
+if (access(args[0], X_OK) == 0)
+{
 pid = fork();
 if (pid == 0)
 {
@@ -72,6 +74,21 @@ perror("shell");
 else
 {
 waitpid(pid, &status, 0);
+for (i = 0; args[i] != NULL; i++)
+{
+free(args[i]);
 }
+}
+}
+else if (strcmp(args[0], "exit") == 0)
+{
+return (0);
+}
+else
+{
+fprintf(stderr, "shell: command not found: %s\n", args[0]);
+return (1);
+}
+
 return (1);
 }
