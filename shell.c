@@ -60,7 +60,7 @@ position++;
 if (position >= bufsize)
 {
 bufsize += TOKEN_BUFSIZE;
-tokens = realloc(tokens, bufsize *sizeof(char *));
+tokens = realloc(tokens, bufsize * sizeof(char *));
 if (!tokens)
 {
 fprintf(stderr, "allocation error\n");
@@ -78,12 +78,17 @@ return (tokens);
  * execute - Execute a command
  * @args: An array of arguments
  *
- * Return: 1 on success, -1 on failure
+ * Return: 1 on success, 0 on exit command, -1 on failure
  */
 int execute(char **args)
 {
 pid_t pid;
 int status;
+
+if (strcmp(args[0], "exit") == 0)
+{
+exit(EXIT_SUCCESS);
+}
 
 pid = fork();
 if (pid == 0)
