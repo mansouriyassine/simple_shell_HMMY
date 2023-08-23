@@ -93,10 +93,8 @@ exit(EXIT_SUCCESS);
 pid = fork();
 if (pid == 0)
 {
-if (execvp(args[0], args) == -1)
-{
-perror("execvp error");
-}
+execve(args[0], args, NULL);
+perror("execve error");
 exit(EXIT_FAILURE);
 }
 else if (pid < 0)
