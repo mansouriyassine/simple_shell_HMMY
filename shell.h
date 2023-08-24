@@ -3,10 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <unistd.h>
 
-char *custom_read_line(void);
-char **parse_line(char *line);
-int execute_command(char **args);
+/* Function prototypes */
+void display_prompt(void);
 
 #endif /* SHELL_H */
