@@ -1,43 +1,26 @@
 #include "shell.h"
+#include "helpers.h"
 
 /**
  * main - Entry point for the simple shell program.
  *
- * Return: Always 0.
+ * Return: EXIT_SUCCESS on successful completion.
  */
 int main(void)
 {
-char *line = NULL;
-size_t len = 0;
-ssize_t nread;
+char *line;
+char **args;
+int status;
 
-while (1)
-{
+do {
 printf("#cisfun$ ");
-nread = getline(&line, &len, stdin);
-
-if (nread == -1)
-{
-if (feof(stdin))
-{
-printf("\n");
-break;
-}
-else
-{
-perror("getline");
-exit(EXIT_FAILURE);
-}
-}
-
-if (line[nread - 1] == '\n')
-{
-line[nread - 1] = '\0';
-}
-
-execute_command(line);
-}
+line = read_line();
+args = parse_line(line);
+status = execute_command(args);
 
 free(line);
-return (0);
+free(args);
+
+} while (status);
+return (EXIT_SUCCESS);
 }

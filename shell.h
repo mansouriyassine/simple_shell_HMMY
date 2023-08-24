@@ -3,11 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <string.h>
 
-void execute_command(char *command);
+char *read_line(void);
+char **parse_line(char *line);
+int execute_command(char **args);
 
 #endif /* SHELL_H */
