@@ -23,10 +23,11 @@ return (line);
  */
 char **parse_line(char *line)
 {
-char **args = malloc(64 * sizeof(char *));
+char **args;
 char *token;
 int i = 0;
 
+args = malloc(64 * sizeof(char *));
 if (!args)
 {
 perror("malloc error");
@@ -45,19 +46,18 @@ return (args);
 }
 
 /**
- * execute_command - Execute a command with its arguments.
- * @args: An array of strings representing the command and its arguments.
+ * execute_external_command - Execute a command
+ * with its arguments.
+ * @args: An array of strings representing the
+ * command and its arguments.
  *
- * Return: 1 to continue the shell loop, 0 to exit the shell.
+ * Return: 1 to continue the shell loop.
  */
-int execute_command(char **args)
+int execute_external_command(char **args)
 {
 pid_t pid;
-int status;
-int i;
+int i, status;
 
-if (access(args[0], X_OK) == 0)
-{
 pid = fork();
 if (pid == 0)
 {
@@ -79,6 +79,45 @@ for (i = 0; args[i] != NULL; i++)
 free(args[i]);
 }
 }
+
+return (1);
+}
+
+/**
+ * execute_builtin_or_default - Execute a built-in
+ * command or a default command.
+ * @args: An array of strings representing the
+ * command and its arguments.
+ *
+ * Return: 1 to continue the shell loop if a built-in command is
+ * executed, 0 otherwise.
+ */
+int execute_builtin_or_default(char **args)
+{
+if (handle_builtin_commands(args) == 0)
+{
+return (1);
+}
+else
+{
+fprintf(stderr, "shell: command not found: %s\n", args[0]);
+return (0);
+}
+}
+
+/**
+ * execute_command - Execute a command with its arguments.
+ * @args: An array of strings representing the command and
+ * its arguments.
+ *
+ * Return: 1 to continue the shell loop if a command is executed,
+ * 0 if the command is "exit".
+ */
+int execute_command(char **args)
+{
+if (access(args[0], X_OK) == 0)
+{
+return (execute_external_command(args));
 }
 else if (strcmp(args[0], "exit") == 0)
 {
@@ -86,9 +125,6 @@ return (0);
 }
 else
 {
-fprintf(stderr, "shell: command not found: %s\n", args[0]);
-return (1);
+return (execute_builtin_or_default(args));
 }
-
-return (1);
 }

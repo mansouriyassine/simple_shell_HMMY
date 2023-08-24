@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 
 /* Function prototypes for helper functions */
+int handle_builtin_commands(char **args);
 char *read_line(void);
 char **parse_line(char *line);
 int execute_command(char **args);
