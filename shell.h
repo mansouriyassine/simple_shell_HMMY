@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *read_line(void);
+char *custom_read_line(void);
 char **parse_line(char *line);
 int execute_command(char **args);
 

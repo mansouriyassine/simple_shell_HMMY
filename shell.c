@@ -25,7 +25,7 @@ int status;
 signal(SIGINT, sigint_handler);
 do {
 printf("#cisfun$ ");
-line = read_line();
+line = custom_read_line();
 args = parse_line(line);
 
 status = execute_command(args);
